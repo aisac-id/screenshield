@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScreenShield — Sensitive-Info Redaction Mirror</title>
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <svg viewBox="0 0 32 32" width="26" height="26" aria-hidden="true">
+      <path d="M16 2 28 6v10c0 7-5 12-12 14C9 28 4 23 4 16V6Z" fill="none" stroke="#10b981" stroke-width="2"/>
+      <rect x="10" y="11" width="5" height="5" fill="#10b981"/>
+      <rect x="15" y="16" width="5" height="5" fill="#34d399" opacity="0.75"/>
+      <rect x="10" y="16" width="5" height="5" fill="#059669" opacity="0.5"/>
+      <rect x="17" y="10" width="4" height="4" fill="#6ee7b7" opacity="0.6"/>
+    </svg>
+    <div class="brand-txt">
+      <strong>SCREEN<span>SHIELD</span></strong>
+      <small>SENSITIVE-INFO REDACTION MIRROR</small>
+    </div>
+  </div>
+  <div class="pills">
+    <span class="pill" id="enginePill">OCR · BOOT</span>
+    <span class="pill" id="ocrMsPill">– ms</span>
+    <span class="pill" id="scanPill">SCANS 0</span>
+  </div>
+  <div class="top-actions">
+    <button class="icon-btn" id="soundBtn" title="Sound (S)">SND</button>
+    <button class="icon-btn" id="pauseBtn" title="Pause scanning (Space)">⏸</button>
+    <button class="icon-btn" id="helpBtn" title="Help (?)">?</button>
+    <a class="icon-btn gh" href="https://github.com/aisac-id/screenshield" target="_blank" rel="noopener" title="GitHub">GH</a>
+  </div>
+</header>
+
+<main class="deck">
+  <section class="col-main">
+
+    <div class="status-banner" id="statusBanner" data-s="SCANNING">
+      <div class="status-icon" id="statusIcon">◌</div>
+      <div class="status-txt">
+        <h1 id="statusWord">SCANNING</h1>
+        <p id="statusSub">Warming up the local OCR engine…</p>
+      </div>
+      <div class="status-counts" id="statusCounts"></div>
+      <button class="btn btn-danger" id="panicBtn" title="Pixelate everything (B)">BLUR ALL</button>
+      <button class="btn btn-emerald" id="cleanBtn" title="Share-safe mirror (F)">SHARE-SAFE MIRROR</button>
+    </div>
+
+    <div class="mirror-panel">
+      <div class="mirror-head">
+        <span class="panel-title">REDACTION MIRROR</span>
+        <span class="src-chip" id="srcChip">DEMO DASHBOARD</span>
+        <label class="tgl shield-tgl" title="Master shield">
+          <input type="checkbox" id="shieldTgl" checked><i></i><b>SHIELD</b>
+        </label>
+        <span class="clock-chip" id="clockChip">00:00</span>
+      </div>
+      <div class="mirror-wrap">
+        <canvas id="mirrorCanvas" width="1600" height="1000"></canvas>
+        <div class="pause-veil" id="pauseVeil" hidden><span>SCANNING PAUSED — SPACE TO RESUME</span></div>
+        <div class="src-gate" id="srcGate" hidden>
+          <p id="gateMsg">Share a screen or tab to protect it.</p>
+          <button class="btn btn-emerald" id="gateBtn">SHARE SCREEN / TAB…</button>
+        </div>
+        <div class="clean-chip" id="cleanChip" hidden>SCREENSHIELD ACTIVE · <b id="cleanCount">0</b> MASKED · ESC TO EXIT</div>
+      </div>
+      <p class="mirror-note">Share <b>this ScreenShield tab</b> in your meeting instead of the original tab — viewers see the pixelated mirror, never the raw values.</p>
+    </div>
+
+    <div class="source-bar">
+      <label class="field">
+        <span>SOURCE</span>
+        <select id="sourceSel">
+          <option value="demo">Demo dashboard (fictional data)</option>
+          <option value="screen">Screen / tab</option>
+        </select>
+      </label>
+      <button class="btn btn-emerald" id="captureBtn" hidden>Share screen / tab…</button>
+      <span class="src-status" id="srcStatus">starting…</span>
+      <button class="btn btn-ghost" id="reportBtn">Export report ↓</button>
+    </div>
+
+    <div class="tune-panel">
+      <div class="panel-title">TUNING</div>
+      <div class="tune-grid">
+        <label class="tune">
+          <span>OCR INTERVAL <b id="intVal">1500 ms</b></span>
+          <input type="range" id="intRange" min="800" max="3000" step="100" value="1500">
+        </label>
+        <label class="tune">
+          <span>PIXEL SIZE <b id="pixVal">14</b></span>
+          <input type="range" id="pixRange" min="6" max="28" step="2" value="14">
+        </label>
+        <label class="tune">
+          <span>MIN OCR CONFIDENCE <b id="confVal">55</b></span>
+          <input type="range" id="confRange" min="30" max="90" step="5" value="55">
+        </label>
+        <div class="toggles">
+          <label class="tgl"><input type="checkbox" id="labelsTgl" checked><i></i>Labels</label>
+          <label class="tgl"><input type="checkbox" id="alertTgl" checked><i></i>New-finding alerts</label>
+          <button class="btn btn-ghost" id="resetTuneBtn">Reset</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <aside class="col-side">
+    <div class="panel">
+      <div class="panel-title">CATEGORIES</div>
+      <div class="cat-list" id="catList"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">FINDINGS <span class="count-badge" id="findCount">0</span></div>
+      <div class="find-list" id="findList"></div>
+      <p class="find-empty" id="findEmpty">Nothing sensitive detected. Values are always masked here — raw text never stored.</p>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">CUSTOM KEYWORDS</div>
+      <div class="kw-add">
+        <input type="text" id="kwInput" placeholder="e.g. Project Falcon, client name…" maxlength="40">
+        <button class="btn" id="kwAddBtn">ADD</button>
+      </div>
+      <div class="kw-chips" id="kwChips"></div>
+      <p class="kw-hint">Anything matching these words gets pixelated too.</p>
+    </div>
+
+    <div class="panel log-panel">
+      <div class="log-head">
+        <span class="panel-title">ACTIVITY</span>
+        <button class="mini-btn" id="clearLogBtn">clear</button>
+      </div>
+      <div class="log-list" id="logList"></div>
+      <p class="log-empty" id="logEmpty">Detections and shield events land here.</p>
+    </div>
+  </aside>
+</main>
+
+<div class="modal-veil" id="helpModal" hidden>
+  <div class="modal">
+    <button class="modal-x" id="helpClose">×</button>
+    <h2>How to use ScreenShield</h2>
+    <h3>Protect a screen share</h3>
+    <ol>
+      <li>Pick <b>Source → Screen / tab</b> and share the window you're about to present.</li>
+      <li>ScreenShield OCRs it locally and pixelates emails, phones, cards, API keys, passwords and your custom keywords.</li>
+      <li>Press <b>Share-safe mirror</b> (F) — the page becomes a clean full-screen mirror.</li>
+      <li>In your meeting, share <b>this ScreenShield tab</b> instead of the original window. Viewers only ever see the redacted mirror.</li>
+    </ol>
+    <h3>Detectors</h3>
+    <ul>
+      <li><b>Email</b> — standard address patterns.</li>
+      <li><b>Phone</b> — international formats, 8–15 digits.</li>
+      <li><b>Card</b> — 13–19 digit numbers that pass the Luhn checksum.</li>
+      <li><b>API secret</b> — GitHub, Stripe, AWS, Slack, Google keys + generic high-entropy tokens.</li>
+      <li><b>Password</b> — short value lines right after a “password” label (heuristic).</li>
+      <li><b>Keyword</b> — anything on your custom list.</li>
+    </ul>
+    <h3>Honest limits</h3>
+    <p>OCR can miss stylized, tiny or low-contrast text, and redaction lags fast-moving content by one scan interval. <b>Always double-check the mirror before presenting.</b> This is a safety net, not a guarantee.</p>
+    <h3>Privacy</h3>
+    <p>All OCR runs locally in WASM. Findings store <b>masked previews only</b> — raw values are never persisted, logged or exported.</p>
+    <h3>Shortcuts</h3>
+    <p><kbd>Space</kbd> pause · <kbd>F</kbd> mirror mode · <kbd>B</kbd> blur all · <kbd>S</kbd> sound · <kbd>?</kbd> help · <kbd>Esc</kbd> exit</p>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script src="vendor/tesseract.min.js"></script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

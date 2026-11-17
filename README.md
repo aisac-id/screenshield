@@ -1,7 +1,7 @@
 # ScreenShield — Sensitive-Info Redaction Mirror
 
 <p align="center">
-  <img src="promo/logo.png" alt="ScreenShield logo mark" width="150">
+  <picture><source media="(prefers-color-scheme: dark)" srcset="promo/logo-white.png"><img src="promo/logo.png" alt="ScreenShield logo mark" width="150"></picture>
 </p>
 
 **See what your screen share is leaking — before your viewers do.**
@@ -92,6 +92,7 @@ End-to-end tested in real Chromium under Xvfb with puppeteer-core and fake media
 | File | What |
 |---|---|
 | `promo/logo.png` | app logo |
+| `promo/logo-white.png` | logo for dark backgrounds |
 | `promo/software-box.png` | product box render |
 | `promo/poster.png` | feature poster |
 | `promo/banner.png` | wide banner |

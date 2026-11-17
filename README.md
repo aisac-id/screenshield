@@ -1,8 +1,16 @@
 # ScreenShield — Sensitive-Info Redaction Mirror
 
+<p align="center">
+  <img src="promo/logo.png" alt="ScreenShield logo mark" width="150">
+</p>
+
 **See what your screen share is leaking — before your viewers do.**
 
 ScreenShield is a Chrome extension that mirrors a screen or tab, OCRs it **fully locally** (Tesseract WASM, no network), and pixelates sensitive values in real time: emails, phone numbers, credit-card numbers (Luhn-validated), API keys, passwords and your own custom keywords. Then you share **the ScreenShield tab itself** in your meeting — a share-safe mirror — instead of the original window.
+
+<p align="center">
+  <img src="promo/software-box.png" alt="ScreenShield software box render" width="360">
+</p>
 
 ![ScreenShield](docs/screenshot.png)
 
